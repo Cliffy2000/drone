@@ -2,51 +2,57 @@ import cv2
 import time
 import asyncio
 from djitellopy import Tello
+from threading import Thread
 
 
-marker = 0
+drone = Tello()
+drone.connect()
+airborne = False
+
+battery = drone.get_battery()
+print(f'Drone battery at {battery}%.')
+if battery <= 15:
+    print("Battery too low.")
+    quit()
+else:
+    drone.streamon()
+    stream = True
 
 
 async def camera_feed():
+    # This function needs to run at all times to provide
+    # constant video stream
+    await asyncio.sleep(0)
     while True:
-        print(f'------')
-        if marker == 1:
+        # Upon activating, the cv2 library would report error messages
+        # due to image feed not yet received
+        frame = drone.get_frame_read().frame
+        img = cv2.resize(frame, (300, 200))
+        cv2.imshow("result", img)
+
+        global stream
+        if not stream:
             return
-        await asyncio.sleep(0)
 
 
 async def drone_control():
-    for i in range(10000):
-        print(f'   {i}   ')
-        if i > 6000:
-            global marker
-            marker = 1
-            return
-        await asyncio.sleep(0)
+    i = 0
+    while True:
+        print(i)
+        i += 1
 
 
-async def main():
-    task_camera = asyncio.create_task(camera_feed())
-    task_drone = asyncio.create_task(drone_control())
+drone.streamon()
+def i():
+    while True:
+        frame = drone.get_frame_read()
+        f = frame.frame
+        img = cv2.resize(f, (300, 200))
+        cv2.imshow("result", img)
 
-    await task_camera
-    await task_drone
+
+r = Thread(target=i)
+r.start()
 
 
-if __name__ == "__main__":
-    drone = Tello()
-    drone.connect()
-
-    battery = drone.get_battery()
-    print(f'Drone battery at {battery}%.')
-    if battery <= 15:
-        print("Battery too low.")
-        quit()
-
-    try:
-        asyncio.run(main())
-    finally:
-        drone.emergency()
-        print("Drone motors off.")
-
-    drone.end()
+drone.end()

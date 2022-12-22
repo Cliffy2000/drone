@@ -4,11 +4,11 @@ import cv2
 import time
 
 
-# drone = Tello()
-# drone.connect()
-# face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-#
-# drone.streamon()
+drone = Tello()
+drone.connect()
+face_cascade = cv2.CascadeClassifier('../../data/model/haarcascade_frontalface_default.xml')
+
+drone.streamon()
 
 
 def camera():
@@ -31,18 +31,18 @@ def camera():
 
 def control():
     time.sleep(5)
-    #drone.takeoff()
+    drone.takeoff()
     while True:
         key = cv2.waitKey(1) & 0xff
         if key == 27:  # ESC
             break
         elif key == ord('w'):
             print('w')
-    #drone.land()
+    drone.land()
 
 
 if __name__ == "__main__":
     thread1 = threading.Thread(target=camera)
     thread2 = threading.Thread(target=control)
-    #thread1.start()
+    # thread1.start()
     thread2.start()

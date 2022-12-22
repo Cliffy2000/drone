@@ -6,7 +6,7 @@ import time
 
 # Speed of the drone
 # 无人机的速度
-S = 20
+S = 25
 # Frames per second of the pygame window display
 # A low number also results in input lag, as input information is processed once per frame.
 # pygame窗口显示的帧数
@@ -21,7 +21,7 @@ class FrontEnd(object):
             - T: Takeoff
             - L: Land
             - Arrow keys: Forward, backward, left and right.
-            - A and D: Counter clockwise and clockwise rotations (yaw)
+            - A and D: Counterclockwise and clockwise rotations (yaw)
             - W and S: Up and down.
 
         保持Tello画面显示并用键盘移动它
@@ -40,7 +40,7 @@ class FrontEnd(object):
         # 初始化pygame
         pygame.init()
 
-        # Creat pygame window
+        # Create pygame window
         # 创建pygame窗口
         pygame.display.set_caption("Tello video stream")
         self.screen = pygame.display.set_mode([960, 720])
@@ -100,7 +100,7 @@ class FrontEnd(object):
             # battery n. 电池
             text = "Battery: {}%".format(self.tello.get_battery())
             cv2.putText(frame, text, (5, 720 - 5),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = np.rot90(frame)
             frame = np.flipud(frame)
@@ -136,7 +136,7 @@ class FrontEnd(object):
             self.up_down_velocity = S
         elif key == pygame.K_s:  # set down velocity
             self.up_down_velocity = -S
-        elif key == pygame.K_a:  # set yaw counter clockwise velocity
+        elif key == pygame.K_a:  # set yaw counterclockwise velocity
             self.yaw_velocity = -S
         elif key == pygame.K_d:  # set yaw clockwise velocity
             self.yaw_velocity = S
@@ -162,7 +162,7 @@ class FrontEnd(object):
             self.tello.takeoff()
             self.send_rc_control = True
         elif key == pygame.K_l:  # land
-            not self.tello.land()
+            self.tello.land()
             self.send_rc_control = False
 
     def update(self):
@@ -172,7 +172,7 @@ class FrontEnd(object):
         """
         if self.send_rc_control:
             self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity,
-                self.up_down_velocity, self.yaw_velocity)
+                                       self.up_down_velocity, self.yaw_velocity)
 
 
 def main():
